@@ -14,13 +14,11 @@ pub enum Action {
 }
 
 #[derive(Clone)]
-pub struct StoreDispatch {
-    pub foo: std::rc::Rc<dyn std::ops::Fn(Action) -> ()>,
-}
+pub struct StoreDispatch(pub std::rc::Rc<dyn std::ops::Fn(Action) -> ()>);
 
 impl StoreDispatch {
     pub fn emit(&self, action: Action) -> () {
-        (self.foo)(action);
+        (self.0)(action);
     }
 }
 

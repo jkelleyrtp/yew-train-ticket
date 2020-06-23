@@ -27,15 +27,9 @@ impl FunctionProvider for IndexFC {
                 initail_state
             });
 
-        let dispatch = StoreDispatch { foo: dispatch };
+        let dispatch = StoreDispatch(dispatch);
         type StoreModelContextProvider = ContextProvider<Rc<StoreModel>>;
         type StoreDispatchContextProvider = ContextProvider<StoreDispatch>;
-
-        let StoreModel {
-            is_high_speed,
-            local_time,
-            ..
-        } = *store;
 
         return html! {
             <>
@@ -45,16 +39,9 @@ impl FunctionProvider for IndexFC {
                             <Header title="火车票"/>
                         </div>
                         <form action="./query.html" class="form">
-                            <Journey
-                            // on_exchange_from_to=Callback::from(move |_| on_exchange_from_to() )
-                            />
-                            <DepartDate date_time={local_time}
-                            // {...departDateCbs}
-                            />
-                            <HighSpeed is_high_speed={is_high_speed}
-                            // on_toggle_is_high_speed=Callback::from(move |_| on_toggle_is_high_speed() )
-                            //  {...highSpeedCbs}
-                            />
+                            <Journey/>
+                            <DepartDate/>
+                            <HighSpeed/>
                             <Submit />
                         </form>
 
