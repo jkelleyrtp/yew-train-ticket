@@ -2,26 +2,34 @@
 use yew::{html, Callback, Html, Properties};
 use yew_functional::{use_context, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
-use super::super::routes::index::StoreModel;
-use std::rc::Rc;
+use crate::store::store::{Action, StoreDispatch, StoreModel};
 
+use std::rc::Rc;
 #[derive(Properties, Clone, PartialEq)]
 pub struct Props {
-    pub on_exchange_from_to: Callback<()>,
+    // pub on_exchange_from_to: Callback<()>,
 }
 
 pub struct JourneyFC {}
+pub type Journey = FunctionComponent<JourneyFC>;
 impl FunctionProvider for JourneyFC {
     type TProps = Props;
 
-    fn run(props: &Self::TProps) -> Html {
+    fn run(_props: &Self::TProps) -> Html {
         let context = use_context::<Rc<StoreModel>>();
+        let context_dispatch = use_context::<StoreDispatch>();
 
         let ctx = &context.unwrap();
+        let StoreModel { to, from, .. } = &***ctx;
 
-        let from = &ctx.from;
-        let to = &ctx.to;
-        let on_exchange_from_to = props.on_exchange_from_to.clone();
+        let onclick = Callback::from(move |_| match &context_dispatch {
+            Some(dispatch) => {
+                let dispatch = &*dispatch;
+                dispatch.emit(Action::ExchangeFromTo);
+                return ();
+            }
+            _ => (),
+        });
 
         return html! {
             <div class="journey">
@@ -38,7 +46,7 @@ impl FunctionProvider for JourneyFC {
                     />
                 </div>
                 <div class="journey-switch"
-                onclick=Callback::from(move |_| on_exchange_from_to.emit(()))
+                 onclick=onclick
                 >
                     {"<>"}
                 </div>
@@ -58,4 +66,3 @@ impl FunctionProvider for JourneyFC {
         };
     }
 }
-pub type Journey = FunctionComponent<JourneyFC>;
