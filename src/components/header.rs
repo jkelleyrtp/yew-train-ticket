@@ -1,29 +1,27 @@
-use crate::routes::AppRoute;
-use yew::{html, Callback, Html};
-use yew_functional::{use_state, FunctionComponent, FunctionProvider};
-use yew_router::prelude::*;
+// use crate::routes::AppRoute;
+use yew::{html, Html, Properties};
+use yew_functional::{FunctionComponent, FunctionProvider};
+// use yew_router::prelude::*;
 
-pub struct NavFC {}
-impl FunctionProvider for NavFC {
-    type TProps = ();
+#[derive(Properties, Clone, PartialEq)]
+pub struct Props {
+    pub title: String,
+}
 
-    fn run(_: &Self::TProps) -> Html {
-        let (counter, set_counter) = use_state(|| 0);
-        let counter1 = counter.clone();
+pub struct HeaderFC {}
+impl FunctionProvider for HeaderFC {
+    type TProps = Props;
 
-        let onclick = Callback::from(move |_| set_counter(*counter + 1));
+    fn run(props: &Self::TProps) -> Html {
+        let title = &props.title;
 
         return html! {
-            <>
-            <button onclick=onclick> {"click me"}</button>
-            <nav>
-                <ul>
-                    <li><RouterAnchor<AppRoute> route=AppRoute::Home classes="app-link" >{*counter1}{ "Home" } </RouterAnchor<AppRoute>></li>
-                    <li><RouterAnchor<AppRoute> route=AppRoute::About classes="app-link">{ "About" }</RouterAnchor<AppRoute>></li>
-                </ul>
-            </nav>
-            </>
+            <div class="header">
+                <div class="header-back"  style=" width=42 height=42" >
+                </div>
+                <h1 class="header-title">{title}</h1>
+            </div>
         };
     }
 }
-pub type Nav = FunctionComponent<NavFC>;
+pub type Header = FunctionComponent<HeaderFC>;

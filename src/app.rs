@@ -2,8 +2,7 @@ use yew::prelude::*;
 use yew_router::switch::Permissive;
 use yew_router::{prelude::*, route::Route};
 
-use crate::components::header::Nav;
-use crate::routes::{about::About, home::Home, AppRoute};
+use crate::routes::{about::About, index::Index, AppRoute};
 
 /// Root component
 pub struct App;
@@ -27,11 +26,11 @@ impl Component for App {
     fn view(&self) -> Html {
         html! {
             <>
-                <Nav />
                 <Router<AppRoute, ()>
                     render = Router::render(|switch: AppRoute | {
                         match switch {
-                            AppRoute::Home => html!{ <Home /> },
+                            AppRoute::Index => html!{ <Index /> },
+                            AppRoute::Home => html!{ <Index /> },
                             AppRoute::About => html!{ <About /> },
                             AppRoute::PageNotFound(Permissive(None)) => html!{"Page not found"},
                             AppRoute::PageNotFound(Permissive(Some(missed_route))) => html!{format!("Page '{}' not found", missed_route)}
