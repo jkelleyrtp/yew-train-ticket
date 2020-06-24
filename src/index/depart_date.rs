@@ -1,5 +1,5 @@
 // use crate::routes::AppRoute;
-use yew::{html, Html};
+use yew::{html, Callback, Html};
 use yew_functional::{use_context, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
 use crate::store::store::{Action, StoreDispatch, StoreModel};
@@ -33,9 +33,19 @@ impl FunctionProvider for DepartDateFC {
             chrono::Weekday::Sun => "周日",
         };
 
+        let context_dispatch = use_context::<StoreDispatch>();
+        let onclick = Callback::from(move |_| match &context_dispatch {
+            Some(dispatch) => {
+                let dispatch = &*dispatch;
+                dispatch.emit(Action::ToggleDateSelectorVisible);
+                return ();
+            }
+            _ => (),
+        });
+
         return html! {
             <div class="depart-date"
-            // nClick={onClick}
+            onclick=onclick
             >
                 <input type="hidden" name="date"
                 value=time

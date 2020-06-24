@@ -6,11 +6,13 @@ pub struct StoreModel {
     pub to: String,
     pub local_time: DateTime<Local>,
     pub is_high_speed: bool,
+    pub date_selector_visible: bool,
 }
 
 pub enum Action {
     ExchangeFromTo,
     ToggleHighSpeed,
+    ToggleDateSelectorVisible,
 }
 
 #[derive(Clone)]
@@ -27,9 +29,10 @@ pub fn reducer(prev: std::rc::Rc<StoreModel>, action: Action) -> StoreModel {
         is_high_speed,
         to,
         from,
+        date_selector_visible,
         ..
     } = &*prev;
-    return match action {
+    match action {
         Action::ExchangeFromTo => StoreModel {
             to: from.clone(),
             from: to.clone(),
@@ -41,5 +44,11 @@ pub fn reducer(prev: std::rc::Rc<StoreModel>, action: Action) -> StoreModel {
             is_high_speed: !*is_high_speed,
             ..*prev
         },
-    };
+        Action::ToggleDateSelectorVisible => StoreModel {
+            from: from.clone(),
+            to: to.clone(),
+            date_selector_visible: !*date_selector_visible,
+            ..*prev
+        },
+    }
 }

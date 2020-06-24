@@ -1,4 +1,6 @@
+use crate::components::date_selector::DateSelector;
 use crate::components::header::Header;
+
 use crate::index::depart_date::DepartDate;
 use crate::index::high_speed::HighSpeed;
 use crate::index::journey::Journey;
@@ -20,6 +22,7 @@ impl FunctionProvider for IndexFC {
             to: "上海".to_string(),
             local_time: Local::now(),
             is_high_speed: true,
+            date_selector_visible: false,
         };
 
         let (store, dispatch) =
@@ -31,12 +34,18 @@ impl FunctionProvider for IndexFC {
         type StoreModelContextProvider = ContextProvider<Rc<StoreModel>>;
         type StoreDispatchContextProvider = ContextProvider<StoreDispatch>;
 
+        let stroe1 = Rc::clone(&store);
+        let StoreModel {
+            date_selector_visible,
+            ..
+        } = &*stroe1;
+
         return html! {
             <>
                 <StoreDispatchContextProvider context=dispatch>
                     <StoreModelContextProvider context=store>
                         <div class="header-wrapper">
-                            <Header title="火车票"/>
+                            <Header title="火车票" onback=None />
                         </div>
                         <form action="./query.html" class="form">
                             <Journey/>
@@ -44,6 +53,11 @@ impl FunctionProvider for IndexFC {
                             <HighSpeed/>
                             <Submit />
                         </form>
+                        <DateSelector
+                        show={*date_selector_visible}
+                        // {...dateSelectorCbs}
+                        // onSelect={onSelectDate}
+                        />
 
                     </StoreModelContextProvider >
                 </StoreDispatchContextProvider >

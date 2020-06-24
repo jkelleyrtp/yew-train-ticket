@@ -21,7 +21,7 @@ impl FunctionProvider for JourneyFC {
             Some(dispatch) => {
                 let dispatch = &*dispatch;
                 dispatch.emit(Action::ExchangeFromTo);
-                return ();
+                ()
             }
             _ => (),
         });
