@@ -1,5 +1,5 @@
 // use crate::routes::AppRoute;
-use yew::{html, Callback, Html};
+use yew::{html, Callback, Html, MouseEvent};
 use yew_functional::{use_context, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
 use crate::store::store::{Action, StoreDispatch, StoreModel};
@@ -17,7 +17,7 @@ impl FunctionProvider for JourneyFC {
         let StoreModel { to, from, .. } = &***ctx;
 
         let context_dispatch = use_context::<StoreDispatch>();
-        let onclick = Callback::from(move |_| match &context_dispatch {
+        let onclick: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
             Some(dispatch) => {
                 let dispatch = &*dispatch;
                 dispatch.emit(Action::ExchangeFromTo);
@@ -26,11 +26,21 @@ impl FunctionProvider for JourneyFC {
             _ => (),
         });
 
+        let context_dispatch = use_context::<StoreDispatch>();
+        let onshow: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
+            Some(dispatch) => {
+                let dispatch = &*dispatch;
+                dispatch.emit(Action::ToggleCitySelectorVisible);
+                return ();
+            }
+            _ => (),
+        });
+
         return html! {
             <div class="journey">
                 <div
                     class="journey-station"
-                    // onClick={() => showCitySelector(true)}
+                    onclick=&onshow
                 >
                     <input
                         type="text"
@@ -47,7 +57,7 @@ impl FunctionProvider for JourneyFC {
                 </div>
                 <div
                     class="journey-station"
-                    // onClick={() => showCitySelector(false)}
+                    onclick=&onshow
                 >
                     <input
                         type="text"

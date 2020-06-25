@@ -1,4 +1,5 @@
 use crate::components::header::Header;
+use crate::index::city_selector::CitySelector;
 use crate::index::date_selector::DateSelector;
 
 use crate::index::depart_date::DepartDate;
@@ -23,6 +24,7 @@ impl FunctionProvider for IndexFC {
             local_time: Local::now(),
             is_high_speed: true,
             date_selector_visible: false,
+            city_selector_visible: false,
         };
 
         let (store, dispatch) =
@@ -53,6 +55,11 @@ impl FunctionProvider for IndexFC {
                             <HighSpeed/>
                             <Submit />
                         </form>
+                        <CitySelector
+                        // show={*date_selector_visible}
+                        // {...dateSelectorCbs}
+                        // onSelect={onSelectDate}
+                        />
                         <DateSelector
                         // show={*date_selector_visible}
                         // {...dateSelectorCbs}
