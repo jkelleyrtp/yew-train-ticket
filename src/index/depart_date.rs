@@ -43,6 +43,9 @@ impl FunctionProvider for DepartDateFC {
             _ => (),
         });
 
+        let now = Local::now();
+        let is_today = now.month() == date_time.month() && now.day() == date_time.day();
+
         return html! {
             <div class="depart-date"
             onclick=onclick
@@ -51,7 +54,7 @@ impl FunctionProvider for DepartDateFC {
                 value=time
                 />
                 {time}
-                <span class="depart-week">{weekday_str}{"(今天)"}</span>
+                <span class="depart-week">{weekday_str}{ if is_today {"(今天)"} else {""} }</span>
             </div>
         };
     }

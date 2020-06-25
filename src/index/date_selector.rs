@@ -1,11 +1,12 @@
 // use crate::routes::AppRoute;
-use yew::{html, Callback, Html, Properties};
+use yew::{html, Callback, Html, MouseEvent, Properties};
 use yew_functional::{use_context, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
 use crate::store::store::{Action, StoreDispatch, StoreModel};
 // use yew_router::prelude::*;
 use crate::components::header::Header;
 use chrono::prelude::*;
+use std::rc::Rc;
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct DayProps {
@@ -18,25 +19,48 @@ impl FunctionProvider for DayProps {
 
     fn run(props: &Self::TProps) -> Html {
         let DayProps { date } = &props;
-
-        let (day, is_today) = match *date {
+        let now = Local::now();
+        let (day, day_str, is_today, prev_class, weekend_class) = match *date {
             Some(day) => {
-                let now = Local::now();
+                let weekend_class = match day.weekday() {
+                    chrono::Weekday::Sat | chrono::Weekday::Sun => "weekend",
+                    _ => "",
+                };
+
                 (
+                    day,
                     day.day().to_string(),
                     now.month() == day.month() && now.day() == day.day(),
+                    if day.day() < now.day() && now.month() == day.month() {
+                        "disabled"
+                    } else {
+                        ""
+                    },
+                    weekend_class,
                 )
             }
-            None => ("".to_string(), false),
+            None => (Local::now(), "".to_string(), false, "", ""),
         };
+
+        let context_dispatch = use_context::<StoreDispatch>();
+        let onclick: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
+            Some(dispatch) => {
+                if day.day() >= now.day() || day.month() > now.month() {
+                    let dispatch = &*dispatch;
+                    dispatch.emit(Action::SelectDate(day));
+                    dispatch.emit(Action::ToggleDateSelectorVisible);
+                }
+                return ();
+            }
+            _ => (),
+        });
 
         return html! {
             <td
-            // class={classnames(classes)
-            // }
-            // onClick={() => onSelect(day)}
+            onclick=onclick
+            class={format!("{} {}",weekend_class,prev_class)}
             >
-            { if is_today { "今天".to_string() } else { day } }
+            { if is_today { "今天".to_string() } else { day_str } }
          </td>
         };
     }
@@ -57,9 +81,6 @@ impl FunctionProvider for WeekFC {
         return html! {
             <tr
             class="date-table-days"
-            // class={classnames(classes)
-            // }
-            // onClick={() => onSelect(day)}
             >
             {for week.iter().map(|date| {
                 html! { <Day date=date /> }
@@ -160,17 +181,18 @@ impl FunctionProvider for MonthFC {
     }
 }
 
-#[derive(Properties, Clone, PartialEq)]
-pub struct Props {
-    pub show: bool,
-}
 pub struct DateSelectorFC {}
 pub type DateSelector = FunctionComponent<DateSelectorFC>;
 impl FunctionProvider for DateSelectorFC {
-    type TProps = Props;
+    type TProps = ();
 
-    fn run(props: &Self::TProps) -> Html {
-        let Props { show } = &props;
+    fn run(_: &Self::TProps) -> Html {
+        let context = use_context::<Rc<StoreModel>>();
+        let ctx = &context.unwrap();
+        let StoreModel {
+            date_selector_visible: show,
+            ..
+        } = &***ctx;
 
         let local_time = Local::now();
         let month = local_time.month();
@@ -195,7 +217,6 @@ impl FunctionProvider for DateSelectorFC {
             <div class=format!("date-selector {}", hidden_class) >
             <Header title="日期选择"
               onback=Some(onclick)
-            // onBack={onBack}
             />
             <div class="date-selector-tables">
             {for date_list.iter().map(|date| {

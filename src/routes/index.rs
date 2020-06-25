@@ -1,5 +1,5 @@
-use crate::components::date_selector::DateSelector;
 use crate::components::header::Header;
+use crate::index::date_selector::DateSelector;
 
 use crate::index::depart_date::DepartDate;
 use crate::index::high_speed::HighSpeed;
@@ -34,11 +34,11 @@ impl FunctionProvider for IndexFC {
         type StoreModelContextProvider = ContextProvider<Rc<StoreModel>>;
         type StoreDispatchContextProvider = ContextProvider<StoreDispatch>;
 
-        let stroe1 = Rc::clone(&store);
-        let StoreModel {
-            date_selector_visible,
-            ..
-        } = &*stroe1;
+        // let stroe1 = Rc::clone(&store);
+        // let StoreModel {
+        //     date_selector_visible,
+        //     ..
+        // } = &*stroe1;
 
         return html! {
             <>
@@ -54,7 +54,7 @@ impl FunctionProvider for IndexFC {
                             <Submit />
                         </form>
                         <DateSelector
-                        show={*date_selector_visible}
+                        // show={*date_selector_visible}
                         // {...dateSelectorCbs}
                         // onSelect={onSelectDate}
                         />

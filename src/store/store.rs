@@ -13,6 +13,7 @@ pub enum Action {
     ExchangeFromTo,
     ToggleHighSpeed,
     ToggleDateSelectorVisible,
+    SelectDate(DateTime<Local>),
 }
 
 #[derive(Clone)]
@@ -48,6 +49,12 @@ pub fn reducer(prev: std::rc::Rc<StoreModel>, action: Action) -> StoreModel {
             from: from.clone(),
             to: to.clone(),
             date_selector_visible: !*date_selector_visible,
+            ..*prev
+        },
+        Action::SelectDate(date) => StoreModel {
+            from: from.clone(),
+            to: to.clone(),
+            local_time: date,
             ..*prev
         },
     }
