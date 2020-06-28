@@ -1,6 +1,6 @@
 {
-  "author": "Jet Li <jing.i.qin@icloud.com>",
-  "name": "yew-app",
+  "author": "anthhub <anthhub@163.com>",
+  "name": "yew-train-ticket",
   "version": "0.1.0",
   "scripts": {
     "build": "WASM_PACK_PROFILE=release parcel build static/index.html --public-url ./",
