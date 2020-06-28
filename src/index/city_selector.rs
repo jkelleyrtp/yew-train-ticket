@@ -1,12 +1,15 @@
 // use crate::routes::AppRoute;
-use yew::{html, Callback, Html, MouseEvent, Properties};
-use yew_functional::{use_context, FunctionComponent, FunctionProvider};
+use yew::{html, Callback, Html, MouseEvent};
+use yew_functional::{use_context,use_effect_with_deps,use_state, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
 use crate::store::store::{Action, StoreDispatch, StoreModel};
-// use yew_router::prelude::*;
-use crate::components::header::Header;
-use chrono::prelude::*;
+use web_sys::console;
 use std::rc::Rc;
+use crate::service::api::get_city_list;
+use crate::service::future::handle_future;
+use crate::service::api::CityResult;
+
+
 
 pub struct CitySelectorFC {}
 pub type CitySelector = FunctionComponent<CitySelectorFC>;
@@ -33,6 +36,27 @@ impl FunctionProvider for CitySelectorFC {
             _ => (),
         });
 
+
+
+        let (city, set_city) = use_state(||"".to_string());
+
+
+        use_effect_with_deps(
+            move|_| {
+                let future = async {
+                    get_city_list().await
+                };
+
+                handle_future(future,move |value :CityResult|  set_city( match value.hotCities.get(0) {
+                    Some(hotCities) => hotCities.name.clone(),
+                    None => "".to_string(),
+                }));
+
+                return || ();
+            },
+            (),
+        );
+
         return html! {
             <div
             class=format!("{} {}", "city-selector" ,hidden_class )
@@ -50,7 +74,7 @@ impl FunctionProvider for CitySelectorFC {
                 <div class="search-input-wrapper">
                     <input
                         type="text"
-                        // value={searchKey}
+                        value=city
                         class="search-input"
                         placeholder="城市、车站的中文或拼音"
                         // onChange={e => setSearchKey(e.target.value)}
@@ -62,6 +86,7 @@ impl FunctionProvider for CitySelectorFC {
                     //     hidden: key.length === 0,
                     // })}
                 >
+                {city}
                    { "&#xf063;"}
                 </i>
             </div>

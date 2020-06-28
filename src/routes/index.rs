@@ -1,13 +1,14 @@
 use crate::components::header::Header;
 use crate::index::city_selector::CitySelector;
 use crate::index::date_selector::DateSelector;
-
 use crate::index::depart_date::DepartDate;
 use crate::index::high_speed::HighSpeed;
 use crate::index::journey::Journey;
 use crate::index::submit::Submit;
+
 use crate::store::store::{reducer, StoreDispatch, StoreModel};
 use chrono::prelude::*;
+
 use std::rc::Rc;
 
 use yew::{html, Html};

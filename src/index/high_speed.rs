@@ -1,5 +1,5 @@
 // use crate::routes::AppRoute;
-use yew::{html, Callback, Html, Properties};
+use yew::{html, Callback, Html};
 use yew_functional::{use_context, FunctionComponent, FunctionProvider};
 // use yew_router::prelude::*;
 use crate::store::store::{Action, StoreDispatch, StoreModel};

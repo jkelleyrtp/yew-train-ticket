@@ -18,22 +18,35 @@ crate-type = ["cdylib", "rlib"]
 log = "0.4"
 yew =  { git = "https://github.com/yewstack/yew"}
 yew-router = { git = "https://github.com/yewstack/yew",features = ["web_sys"]}
-wasm-bindgen = "0.2.57"
 wasm-logger = "0.2.0"
 wee_alloc = "0.4.5"
 yew-functional = { git = "https://github.com/yewstack/yew"}
+wasm-bindgen = { version = "0.2.61", features = ["serde-serialize"]  }
+wasm-bindgen-futures = "0.4.3"
+futures = "0.3.5"
+js-sys = "0.3.40"
+serde = { version = "1.0.80", features = ["derive"] }
+serde_derive = "^1.0.59"
+
 
 [dependencies.chrono]
 version = "0.4"
 features = ["serde", "wasmbind"]
 
-[dev-dependencies]
-wasm-bindgen-test = "0.3.9"
-
-[dev-dependencies.web-sys]
-version = "0.3"
+[dependencies.web-sys]
+version = "0.3.35"
 features = [
   "Document",
   "Element",
   "HtmlCollection",
+  'Headers',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  'Window',
 ]
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3.9"
+

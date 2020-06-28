@@ -20,7 +20,7 @@ impl FunctionProvider for DayProps {
     fn run(props: &Self::TProps) -> Html {
         let DayProps { date } = &props;
         let now = Local::now();
-        
+
         let (day, day_str, is_today, prev_class, weekend_class) = match *date {
             Some(day) => {
                 let weekend_class = match day.weekday() {
