@@ -1,5 +1,4 @@
 #![allow(unused_variables)]
-
 use super::fetch::Fetch;
 use serde::{Deserialize, Serialize,};
 
@@ -12,7 +11,7 @@ pub struct CityResult {
 }
 
 impl CityResult {
-   fn new() -> CityResult{
+  pub  fn new() -> CityResult{
     CityResult{hotCities : vec![] , cityList : vec![] ,version :0 }
    }
 }
@@ -30,19 +29,14 @@ pub struct CityList {
     pub citys: Citys,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Citys(pub Vec<City>);
-
-impl Default for Citys {
-    fn default() -> Self {
-        Citys(vec![])
-    }
-}
+type Citys = Vec<City>;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct City {
     pub name: String,
 }
+
+
 
 // #[wasm_bindgen]
 pub async fn get_city_list() -> CityResult {
