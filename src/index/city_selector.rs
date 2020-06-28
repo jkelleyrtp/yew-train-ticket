@@ -1,18 +1,84 @@
+use yew::{html, Callback, Html, MouseEvent, Properties};
 
-use yew::{html, Callback, Html, MouseEvent,Properties};
-
-use yew_functional::{use_context,use_effect_with_deps,use_state, FunctionComponent, FunctionProvider};
 use crate::store::store::{Action, StoreDispatch, StoreModel};
 use std::rc::Rc;
-use crate::service::api::get_city_list;
+use yew_functional::{
+    use_context, use_effect_with_deps, use_state, FunctionComponent, FunctionProvider,
+};
+
+use crate::service::search_city_list::{search_city_list, SearchCityResult};
+
+use crate::service::city_list::{get_city_list, City, CityResult};
 use crate::service::future::handle_future;
-use crate::service::api::{CityResult,City};
 
+#[derive(Properties, Clone, PartialEq)]
+pub struct SuggestItemProps {
+    pub name: String,
+}
+pub struct SuggestItemFC {}
+pub type SuggestItem = FunctionComponent<SuggestItemFC>;
+impl FunctionProvider for SuggestItemFC {
+    type TProps = SuggestItemProps;
 
+    fn run(props: &Self::TProps) -> Html {
+        let SuggestItemProps { name } = &props;
+
+        return html! {
+            <li class="city-li"
+            // onClick={() => onSelect(name)}
+            >
+                {name}
+            </li>
+        };
+    }
+}
+
+#[derive(Properties, Clone, PartialEq)]
+pub struct SuggestProps {
+    pub search_word: String,
+}
+pub struct SuggestFC {}
+pub type Suggest = FunctionComponent<SuggestFC>;
+impl FunctionProvider for SuggestFC {
+    type TProps = SuggestProps;
+
+    fn run(props: &Self::TProps) -> Html {
+        let SuggestProps { search_word } = &props;
+        let search_word = search_word.clone();
+        let search_word1 = search_word.clone();
+
+        let (search_city_data, set_search_city_data) = use_state(|| SearchCityResult::new());
+        let search_result = &(*search_city_data).result;
+        use_effect_with_deps(
+            move |_| {
+                let future = async { search_city_list(search_word1).await };
+
+                handle_future(future, move |value| set_search_city_data(value));
+                return || ();
+            },
+            (search_word),
+        );
+
+        return html! {
+            <div class="city-suggest">
+                <ul class="city-suggest-ul">
+                    {for search_result.iter().map(|item| {
+                        html! {
+                            <SuggestItem
+                                name={item.display.clone()}
+                                // onClick={onSelect}
+                            />
+                        }
+                    })}
+                </ul>
+            </div>
+        };
+    }
+}
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct AlphaIndexProps {
-    pub alpha: char
+    pub alpha: char,
 }
 pub struct AlphaIndexFC {}
 pub type AlphaIndex = FunctionComponent<AlphaIndexFC>;
@@ -23,7 +89,7 @@ impl FunctionProvider for AlphaIndexFC {
         let AlphaIndexProps { alpha } = &props;
 
         return html! {
-            <i class="city-index-item" 
+            <i class="city-index-item"
             // onClick={() => onClick(alpha)}
             >
                 {alpha}
@@ -32,10 +98,9 @@ impl FunctionProvider for AlphaIndexFC {
     }
 }
 
-
 #[derive(Properties, Clone, PartialEq)]
 pub struct CityItemProps {
-    pub name: String
+    pub name: String,
 }
 pub struct CityItemFC {}
 pub type CityItem = FunctionComponent<CityItemFC>;
@@ -46,7 +111,7 @@ impl FunctionProvider for CityItemFC {
         let CityItemProps { name } = &props;
 
         return html! {
-            <li class="city-li" 
+            <li class="city-li"
             // onClick={() => onSelect(name)}
             >
             {name}
@@ -55,12 +120,10 @@ impl FunctionProvider for CityItemFC {
     }
 }
 
-
-
 #[derive(Properties, Clone, PartialEq)]
 pub struct CitySectionProps {
     pub city_names: Vec<String>,
-    pub title: String
+    pub title: String,
 }
 pub struct CitySectionFC {}
 pub type CitySection = FunctionComponent<CitySectionFC>;
@@ -68,7 +131,7 @@ impl FunctionProvider for CitySectionFC {
     type TProps = CitySectionProps;
 
     fn run(props: &Self::TProps) -> Html {
-        let CitySectionProps { title,city_names } = &props;
+        let CitySectionProps { title, city_names } = &props;
 
         return html! {
             <ul class="city-ul">
@@ -81,13 +144,11 @@ impl FunctionProvider for CitySectionFC {
                             name={name}
                             // onSelect={onSelect}
                         />}
-                    
                 })}
              </ul>
         };
     }
 }
-
 
 pub struct CitySelectorFC {}
 pub type CitySelector = FunctionComponent<CitySelectorFC>;
@@ -103,7 +164,6 @@ impl FunctionProvider for CitySelectorFC {
             ..
         } = &***ctx;
 
-
         let show1 = show.clone();
 
         let hidden_class = if *show { "" } else { "hidden" };
@@ -118,49 +178,44 @@ impl FunctionProvider for CitySelectorFC {
             _ => (),
         });
 
+        let (loading, set_loading) = use_state(|| false);
 
-        let (loading, set_loading) = use_state(||false);
-
-
-        let (search_word, set_search_word) = use_state(||"".to_string());
-
+        let (search_word, set_search_word) = use_state(|| "".to_string());
+        let search_word = &*search_word;
         let has_search_word = search_word.len() > 0;
 
-        let clear_hidden_class = if has_search_word {""} else { "hidden"};
+        let clear_hidden_class = if has_search_word { "" } else { "hidden" };
 
-        let set_search_word =Rc::new(set_search_word);
+        let set_search_word = Rc::new(set_search_word);
         let set_search_word1 = Rc::clone(&set_search_word);
 
-        let oninput :Callback<yew::html::InputData>  = Callback::from(move |evt:yew::html::InputData|set_search_word(evt.value));
+        let oninput: Callback<yew::html::InputData> =
+            Callback::from(move |evt: yew::html::InputData| set_search_word(evt.value));
 
-        let onclear :Callback<MouseEvent>  = Callback::from(move |_|set_search_word1("".to_string()));
+        let onclear: Callback<MouseEvent> =
+            Callback::from(move |_| set_search_word1("".to_string()));
 
-
-        let (city_data, set_city_data) = use_state(||CityResult::new());
-        let sections =&(*city_data).cityList;
+        let (city_data, set_city_data) = use_state(|| CityResult::new());
+        let sections = &(*city_data).cityList;
 
         let alphabet: Vec<char> = "ABCDEFGIJKLMNOPQRSTUVWXYZ".chars().collect();
 
         use_effect_with_deps(
-            move|_| {
-
-                if show1  {
+            move |_| {
+                if show1 {
                     set_loading(true);
-                    let future = async {
-                        get_city_list().await
-                    };
-    
-                    handle_future(future,move |value :CityResult| {                
+                    let future = async { get_city_list().await };
+
+                    handle_future(future, move |value: CityResult| {
                         set_loading(false);
-                        set_city_data(value)}
-                );
+                        set_city_data(value)
+                    });
                 }
 
                 return || ();
             },
             (show1),
         );
-
         return html! {
             <div
             class=format!("{} {}", "city-selector" ,hidden_class )
@@ -185,16 +240,20 @@ impl FunctionProvider for CitySelectorFC {
                 </div>
                 <div
                     onclick=onclear
-                    class=format!("{} {}", "search-clean" ,clear_hidden_class )   
+                    class=format!("{} {}", "search-clean" ,clear_hidden_class )
                 >
                    { "x"}
                 </div>
             </div>
-            // {Boolean(key) && (
-            //     <Suggest searchKey={key} onSelect={key => onSelect(key)} />
-            // )}
-            {if *loading { html! {<div>{"loading"}</div>} } else { 
-            html! {   
+            {if has_search_word {
+                html! {
+                    <Suggest
+                    search_word=search_word
+                    // onSelect={key => onSelect(key)}
+                    />
+            }} else {  html!{ <div/>} } }
+            {if *loading { html! {<div>{"loading"}</div>} } else {
+            html! {
                 <div class="city-list">
                     <div class="city-cate">
                         {for sections.iter().map(move |section| {
@@ -223,7 +282,6 @@ impl FunctionProvider for CitySelectorFC {
                     </div>
                 </div>
                 } } }
-                // {outputCitySections()}
             </div>
         };
     }
