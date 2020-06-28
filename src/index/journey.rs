@@ -17,7 +17,7 @@ impl FunctionProvider for JourneyFC {
         let StoreModel { to, from, .. } = &***ctx;
 
         let context_dispatch = use_context::<StoreDispatch>();
-        let onclick: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
+        let onexchange: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
             Some(dispatch) => {
                 let dispatch = &*dispatch;
                 dispatch.emit(Action::ExchangeFromTo);
@@ -27,9 +27,22 @@ impl FunctionProvider for JourneyFC {
         });
 
         let context_dispatch = use_context::<StoreDispatch>();
-        let onshow: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
+        let context_dispatch1 = context_dispatch.clone();
+
+        let onclickfrom: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch {
             Some(dispatch) => {
                 let dispatch = &*dispatch;
+                dispatch.emit(Action::SetIsSelectingFrom(true));
+                dispatch.emit(Action::ToggleCitySelectorVisible);
+                return ();
+            }
+            _ => (),
+        });
+
+        let onclickto: Callback<MouseEvent> = Callback::from(move |_| match &context_dispatch1 {
+            Some(dispatch) => {
+                let dispatch = &*dispatch;
+                dispatch.emit(Action::SetIsSelectingFrom(false));
                 dispatch.emit(Action::ToggleCitySelectorVisible);
                 return ();
             }
@@ -40,7 +53,7 @@ impl FunctionProvider for JourneyFC {
             <div class="journey">
                 <div
                     class="journey-station"
-                    onclick=&onshow
+                    onclick=onclickfrom
                 >
                     <input
                         type="text"
@@ -51,13 +64,13 @@ impl FunctionProvider for JourneyFC {
                     />
                 </div>
                 <div class="journey-switch"
-                 onclick=onclick
+                 onclick=onexchange
                 >
                     {"<>"}
                 </div>
                 <div
                     class="journey-station"
-                    onclick=&onshow
+                    onclick=onclickto
                 >
                     <input
                         type="text"

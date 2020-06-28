@@ -1,12 +1,12 @@
-use yew::{html, Callback, Html, MouseEvent, Properties};
-
+use crate::service::search_city_list::{search_city_list, SearchCityResult};
 use crate::store::store::{Action, StoreDispatch, StoreModel};
 use std::rc::Rc;
+use wasm_bindgen::prelude::*;
+use web_sys::console;
+use yew::{html, Callback, Html, MouseEvent, Properties};
 use yew_functional::{
     use_context, use_effect_with_deps, use_state, FunctionComponent, FunctionProvider,
 };
-
-use crate::service::search_city_list::{search_city_list, SearchCityResult};
 
 use crate::service::city_list::{get_city_list, City, CityResult};
 use crate::service::future::handle_future;
@@ -23,9 +23,38 @@ impl FunctionProvider for SuggestItemFC {
     fn run(props: &Self::TProps) -> Html {
         let SuggestItemProps { name } = &props;
 
+        let context = use_context::<Rc<StoreModel>>();
+        let ctx = &context.unwrap();
+        let StoreModel {
+            is_selecting_from, ..
+        } = &***ctx;
+
+        let is_selecting_from = is_selecting_from.clone();
+
+        let name1 = name.clone();
+
+        let context_dispatch = use_context::<StoreDispatch>();
+        let onclick: Callback<MouseEvent> =
+            Callback::from(move |_: MouseEvent| match &context_dispatch {
+                Some(dispatch) => {
+                    let name1 = name1.clone();
+                    let dispatch = &*dispatch;
+
+                    if is_selecting_from {
+                        dispatch.emit(Action::SelectFrom(name1));
+                    } else {
+                        dispatch.emit(Action::SelectTo(name1));
+                    }
+                    dispatch.emit(Action::ToggleCitySelectorVisible);
+
+                    return ();
+                }
+                _ => (),
+            });
+
         return html! {
             <li class="city-li"
-            // onClick={() => onSelect(name)}
+            onclick=onclick
             >
                 {name}
             </li>
@@ -66,7 +95,6 @@ impl FunctionProvider for SuggestFC {
                         html! {
                             <SuggestItem
                                 name={item.display.clone()}
-                                // onClick={onSelect}
                             />
                         }
                     })}
@@ -87,10 +115,28 @@ impl FunctionProvider for AlphaIndexFC {
 
     fn run(props: &Self::TProps) -> Html {
         let AlphaIndexProps { alpha } = &props;
+        let alpha = alpha.clone();
+
+        let onclick: Callback<MouseEvent> = Callback::from(move |_| {
+            let window = web_sys::window().expect("no global `window` exists");
+            let document = window.document().expect("should have a document on window");
+            let body = document.body().expect("document should have a body");
+            let ele = document
+                .query_selector(&format!("[data-cate='{}']", alpha.to_string()))
+                .expect("document should have a body");
+
+            match ele {
+                Some(ele) => {
+                    console::log_1(&alpha.to_string().into());
+                    ele.scroll_into_view()
+                }
+                _ => (),
+            };
+        });
 
         return html! {
             <i class="city-index-item"
-            // onClick={() => onClick(alpha)}
+            onclick=onclick
             >
                 {alpha}
             </i>
@@ -110,9 +156,37 @@ impl FunctionProvider for CityItemFC {
     fn run(props: &Self::TProps) -> Html {
         let CityItemProps { name } = &props;
 
+        let context = use_context::<Rc<StoreModel>>();
+        let ctx = &context.unwrap();
+        let StoreModel {
+            is_selecting_from, ..
+        } = &***ctx;
+
+        let is_selecting_from = is_selecting_from.clone();
+
+        let name1 = name.clone();
+
+        let context_dispatch = use_context::<StoreDispatch>();
+        let onclick: Callback<MouseEvent> =
+            Callback::from(move |_: MouseEvent| match &context_dispatch {
+                Some(dispatch) => {
+                    let name1 = name1.clone();
+                    let dispatch = &*dispatch;
+                    if is_selecting_from {
+                        dispatch.emit(Action::SelectFrom(name1));
+                    } else {
+                        dispatch.emit(Action::SelectTo(name1));
+                    }
+                    dispatch.emit(Action::ToggleCitySelectorVisible);
+
+                    return ();
+                }
+                _ => (),
+            });
+
         return html! {
             <li class="city-li"
-            // onClick={() => onSelect(name)}
+            onclick=onclick
             >
             {name}
         </li>
@@ -142,7 +216,6 @@ impl FunctionProvider for CitySectionFC {
                     html!{
                         <CityItem
                             name={name}
-                            // onSelect={onSelect}
                         />}
                 })}
              </ul>
@@ -249,7 +322,6 @@ impl FunctionProvider for CitySelectorFC {
                 html! {
                     <Suggest
                     search_word=search_word
-                    // onSelect={key => onSelect(key)}
                     />
             }} else {  html!{ <div/>} } }
             {if *loading { html! {<div>{"loading"}</div>} } else {

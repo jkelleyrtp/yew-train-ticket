@@ -8,6 +8,7 @@ pub struct StoreModel {
     pub is_high_speed: bool,
     pub date_selector_visible: bool,
     pub city_selector_visible: bool,
+    pub is_selecting_from: bool,
 }
 
 pub enum Action {
@@ -16,6 +17,9 @@ pub enum Action {
     ToggleDateSelectorVisible,
     ToggleCitySelectorVisible,
     SelectDate(DateTime<Local>),
+    SelectFrom(String),
+    SelectTo(String),
+    SetIsSelectingFrom(bool),
 }
 
 #[derive(Clone)]
@@ -64,6 +68,22 @@ pub fn reducer(prev: std::rc::Rc<StoreModel>, action: Action) -> StoreModel {
             from: from.clone(),
             to: to.clone(),
             local_time: date,
+            ..*prev
+        },
+        Action::SelectFrom(from) => StoreModel {
+            from,
+            to: to.clone(),
+            ..*prev
+        },
+        Action::SelectTo(to) => StoreModel {
+            from: from.clone(),
+            to,
+            ..*prev
+        },
+        Action::SetIsSelectingFrom(is_selecting_from) => StoreModel {
+            from: from.clone(),
+            to: to.clone(),
+            is_selecting_from,
             ..*prev
         },
     }

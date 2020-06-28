@@ -26,6 +26,7 @@ impl FunctionProvider for IndexFC {
             is_high_speed: true,
             date_selector_visible: false,
             city_selector_visible: false,
+            is_selecting_from: false,
         };
 
         let (store, dispatch) =
