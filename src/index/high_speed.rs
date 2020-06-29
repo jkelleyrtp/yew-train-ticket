@@ -34,7 +34,7 @@ impl FunctionProvider for HighSpeedFC {
             onclick=onclick
 
             >
-                <input type="hidden" name="highSpeed" value={is_high_speed} />
+                <input type="hidden" name="high_speed" value={is_high_speed} />
                 <div
                     class=format!("{} {}", "high-speed-track", checked)
                 >

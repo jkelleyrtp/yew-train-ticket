@@ -11,10 +11,11 @@ use chrono::prelude::*;
 
 use std::rc::Rc;
 
-use yew::{html, Html};
+use yew::{html, Callback, Html, MouseEvent};
 use yew_functional::{use_reducer_with_init, ContextProvider, FunctionComponent, FunctionProvider};
 
 pub struct IndexFC {}
+pub type Index = FunctionComponent<IndexFC>;
 impl FunctionProvider for IndexFC {
     type TProps = ();
 
@@ -38,18 +39,22 @@ impl FunctionProvider for IndexFC {
         type StoreModelContextProvider = ContextProvider<Rc<StoreModel>>;
         type StoreDispatchContextProvider = ContextProvider<StoreDispatch>;
 
-        // let stroe1 = Rc::clone(&store);
-        // let StoreModel {
-        //     date_selector_visible,
-        //     ..
-        // } = &*stroe1;
+        let window = web_sys::window().unwrap();
+        let history = window
+            .history()
+            .expect("browser does not support history API");
+
+        let onclick: Callback<MouseEvent> = Callback::from(move |_| {
+            history.back();
+            ()
+        });
 
         return html! {
             <>
                 <StoreDispatchContextProvider context=dispatch>
                     <StoreModelContextProvider context=store>
                         <div class="header-wrapper">
-                            <Header title="火车票" onback=None />
+                            <Header title="火车票" onback=Some(onclick) />
                         </div>
                         <form action="./query.html" class="form">
                             <Journey/>
@@ -58,14 +63,8 @@ impl FunctionProvider for IndexFC {
                             <Submit />
                         </form>
                         <CitySelector
-                        // show={*date_selector_visible}
-                        // {...dateSelectorCbs}
-                        // onSelect={onSelectDate}
                         />
                         <DateSelector
-                        // show={*date_selector_visible}
-                        // {...dateSelectorCbs}
-                        // onSelect={onSelectDate}
                         />
 
                     </StoreModelContextProvider >
@@ -74,4 +73,3 @@ impl FunctionProvider for IndexFC {
         };
     }
 }
-pub type Index = FunctionComponent<IndexFC>;
