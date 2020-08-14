@@ -1,5 +1,4 @@
-use yew_router::prelude::*;
-use yew_router::switch::Permissive;
+use yew_router::{prelude::*, switch::Permissive};
 
 pub mod index;
 pub mod query;

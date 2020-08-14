@@ -28,6 +28,7 @@ js-sys = "0.3.40"
 serde = { version = "1.0.80", features = ["derive"] }
 serde_derive = "^1.0.59"
 urlparse = "0.7.3"
+fc-macros = {git="https://github.com/jkelleyrtp/yew-fc-macros"}
 
 
 [dependencies.chrono]

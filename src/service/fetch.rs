@@ -1,10 +1,8 @@
 #![allow(unused_variables)]
 
-use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
+use wasm_bindgen::{prelude::*, JsCast};
 use wasm_bindgen_futures::JsFuture;
-use web_sys::console;
-use web_sys::{Request, RequestInit, RequestMode, Response};
+use web_sys::{console, Request, RequestInit, RequestMode, Response};
 use yew::services::fetch::Method;
 
 #[wasm_bindgen]

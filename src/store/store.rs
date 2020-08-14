@@ -25,6 +25,17 @@ pub enum Action {
 #[derive(Clone)]
 pub struct StoreDispatch(pub std::rc::Rc<dyn std::ops::Fn(Action) -> ()>);
 
+impl PartialEq for StoreDispatch {
+    fn eq(&self, other: &StoreDispatch) -> bool {
+        false
+    }
+}
+impl PartialEq for StoreModel {
+    fn eq(&self, other: &StoreModel) -> bool {
+        false
+    }
+}
+
 impl StoreDispatch {
     pub fn emit(&self, action: Action) -> () {
         (self.0)(action);

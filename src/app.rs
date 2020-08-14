@@ -1,6 +1,5 @@
 use yew::prelude::*;
-use yew_router::switch::Permissive;
-use yew_router::{prelude::*, route::Route};
+use yew_router::{prelude::*, route::Route, switch::Permissive};
 
 use crate::routes::{index::Index, query::Query, AppRoute};
 

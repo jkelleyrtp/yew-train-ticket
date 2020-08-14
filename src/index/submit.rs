@@ -1,24 +1,14 @@
-// use crate::routes::AppRoute;
-use yew::{html, Html, Properties};
+use fc_macros::functional_component;
+use yew::{html, Html};
 use yew_functional::{FunctionComponent, FunctionProvider};
-// use yew_router::prelude::*;
 
-#[derive(Properties, Clone, PartialEq)]
-pub struct Props {}
-
-pub struct SubmitFC {}
-pub type Submit = FunctionComponent<SubmitFC>;
-
-impl FunctionProvider for SubmitFC {
-    type TProps = Props;
-
-    fn run(_props: &Self::TProps) -> Html {
-        return html! {
-            <div class="submit">
-            <button type="submit" class="submit-button">
-                {"搜索"}
-            </button>
-        </div>
-        };
-    }
+#[functional_component]
+fn submit() -> Html {
+    return html! {
+        <div class="submit">
+        <button type="submit" class="submit-button">
+            {"搜索"}
+        </button>
+    </div>
+    };
 }

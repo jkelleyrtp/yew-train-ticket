@@ -1,7 +1,6 @@
 #![allow(unused_variables)]
 use super::fetch::Fetch;
-use serde::{Deserialize, Serialize,};
-
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CityResult {
@@ -11,14 +10,18 @@ pub struct CityResult {
 }
 
 impl CityResult {
-  pub  fn new() -> CityResult{
-    CityResult{hotCities : vec![] , cityList : vec![] ,version :0 }
-   }
+    pub fn new() -> CityResult {
+        CityResult {
+            hotCities: vec![],
+            cityList: vec![],
+            version: 0,
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct HotCities {
-    pub  name: String,
+    pub name: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -36,8 +39,6 @@ pub struct City {
     pub name: String,
 }
 
-
-
 // #[wasm_bindgen]
 pub async fn get_city_list() -> CityResult {
     let url = format!("http://localhost:80/rest/cities?_1593270305661");
@@ -47,5 +48,4 @@ pub async fn get_city_list() -> CityResult {
         Ok(json) => json.into_serde().unwrap(),
         Err(_) => CityResult::new(),
     }
-   
 }
